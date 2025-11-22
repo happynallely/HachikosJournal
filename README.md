@@ -1,5 +1,6 @@
 # Will-Franklin Eller forked this repository to explore for Application Development class. This code may be useful for his project involving a journaling app for mental health.
 
+
 # HackRU 2020 (1st Place - Health Hack)
 ## Inspiration
 Mental health includes our emotional, psychological, and social well-being. It affects how we think, feel, and act. It also helps determine how we handle stress, relate to others, and make choices. Mental health is important at every stage of life, from childhood and adolescence through adulthood.  
