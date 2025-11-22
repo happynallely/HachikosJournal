@@ -7,7 +7,7 @@ import datetime
 import re
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTabWidget, QTextEdit, QGridLayout, QLabel, QListWidget, QListWidgetItem
 from PyQt5.QtGui import QFont, QPixmap, QMovie, QColor
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal # pyqtSignal is correctly imported here
 from QSharpTools import SharpButton
 from GoogleSentiment import getSentiment
 from compliments import compliments
@@ -29,11 +29,14 @@ class Window(QMainWindow):
         self.yPos = int((screenSizeY/2) - (self.height/2))
         self.sentThread = sentimentThread()
         self.initUI()
+        # NOTE: The connection to the signal is REMOVED from __init__ 
+        # and moved to initUI to ensure 'update_speech_label' is defined
+        # and all UI elements are fully initialized.
 
     def initUI(self):
         self.setGeometry(self.xPos, self.yPos, self.width, self.height)
         self.setFixedSize(self.width, self.height)
-        self.setWindowTitle("Brain Buddy Journal")
+        self.setWindowTitle("Stability Journal")
 
         windowBG = "rgb(66, 133, 129)"
         selectedColor = "rgb(33, 82, 79)"
@@ -51,11 +54,11 @@ class Window(QMainWindow):
         journalFont = QFont("Century Gothic")
         self.journalEdit.setFont(journalFont)
         self.journalEdit.setStyleSheet("background-image: url(img/linedpaper.png); background-repeat: no-repeat; background-position: center; font-size: 24px;")
-        self.journalEdit.setText("Dear Brain Buddy,\n\n")
+        self.journalEdit.setText("Dear Self,\n\n")
         self.journalLayout.addWidget(self.journalEdit, 0, 0, 1, 4)
 
         self.speechLabel = QLabel()
-        self.speechLabel.setText("\t    Hi! I'm Brain Buddy!")
+        self.speechLabel.setText("\t    Hi! I'm Renji")
         self.speechLabel.setStyleSheet("background-image: url(img/speechbubble.png); background-repeat: no-repeat; font-size: 20px;")
         self.journalLayout.addWidget(self.speechLabel, 1, 0, 1, 3)
 
@@ -65,6 +68,7 @@ class Window(QMainWindow):
         self.hachikoMovie.start()
         self.journalLayout.addWidget(self.hachikoLabel, 1, 3)
 
+        # NOTE: SharpButton calls now work because QSharpTools.py was updated
         self.saveButton = SharpButton(primaryColor = windowBG, secondaryColor = colorBG)
         self.saveButton.setText("Save Journal")
         self.saveButton.clicked.connect(self.save)
@@ -112,9 +116,16 @@ class Window(QMainWindow):
 
         self.memoriesTab.setLayout(self.memoriesLayout)
 
+        # NOTE: Signal connection is safely done AFTER all UI setup
+        self.sentThread.speech_update.connect(self.update_speech_label) 
+        
         self.sentThread.start()
 
         self.show()
+
+    # NOTE: New method to safely update the GUI from the main thread
+    def update_speech_label(self, text):
+        self.speechLabel.setText(text)
 
     def save(self):
         global documentScore
@@ -153,6 +164,9 @@ class Window(QMainWindow):
                 self.journalEdit.setText(jrnlFile.read())
 
 class sentimentThread(QThread):
+    # NOTE: Defined a signal to safely send updates to the main thread
+    speech_update = pyqtSignal(str) 
+
     def __init__(self):
         super().__init__()
 
@@ -163,17 +177,29 @@ class sentimentThread(QThread):
         wrapper = textwrap.TextWrapper(width=25)
         while not endSentThread:
             time.sleep(10)
-            score, mag = getSentiment(myWin.journalEdit.toPlainText())
-            documentScore = score
-            documentMag = mag
+            
+            # NOTE: Added try...except block to prevent crashes from network errors
+            try:
+                score, mag = getSentiment(myWin.journalEdit.toPlainText())
+                documentScore = score
+                documentMag = mag
 
-            if score < 0 and mag > 1:
-                newText = str(random.choice(motivators))
-            else:
-                newText = str(random.choice(compliments))
-            newText = "\t" + "\n\t".join(wrapper.wrap(text = newText))
-            myWin.speechLabel.setText(newText)
+                if score < 0 and mag > 1:
+                    newText = str(random.choice(motivators))
+                else:
+                    newText = str(random.choice(compliments))
+                
+                newText = "\t" + "\n\t".join(wrapper.wrap(text = newText))
+                
+                # NOTE: Replaced direct GUI call (myWin.speechLabel.setText) with signal emission
+                self.speech_update.emit(newText) 
 
+            except Exception as e:
+                print(f"Sentiment Analysis Error: {e}")
+                default_text = "Renji needs a coffee break... Sentiment analysis failed."
+                default_text = "\t" + "\n\t".join(wrapper.wrap(text = default_text))
+                self.speech_update.emit(default_text) # Report error via signal
+                
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     myWin = Window()
