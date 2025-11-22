@@ -1,11 +1,11 @@
 - [X] Create title for app DONE
 - [X] Create description of the app DONE
 - [X] Research existing code files on GitHub DONE
-- [x] Create Read.me commit DONE
+- [] Create Read.me commit DONE
 - [X] Fork code to KSU IS DONE
 - [X] Clone files to Github Desktop and upload them to Visual Studio DONE
 - [X] Run the code DONE
-- [X] Download CodeBeat and let it analyze code DONE
-- [X] Review suggested changes from CodeBeat DONE
-- [X] Make changes to code DONE
+- [ ] Download CodeBeat and let it analyze code DONE
+- [ ] Review suggested changes from CodeBeat DONE
+- [ ] Make changes to code DONE
 - [ ] Begin working on presentation portion of project
