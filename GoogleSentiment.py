@@ -2,7 +2,7 @@ import os
 from google.cloud import language_v1
 
 def getSentiment(text):
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"MyFirstProject-da5d6b04be74.json"
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"mental-health-journal-479004-aab798eb70ab.json"
     client = language_v1.LanguageServiceClient()
     document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
     sentiment = client.analyze_sentiment(request={'document': document}).document_sentiment

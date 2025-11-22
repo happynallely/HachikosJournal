@@ -38,10 +38,10 @@ class Window(QMainWindow):
         self.setFixedSize(self.width, self.height)
         self.setWindowTitle("Stability Journal")
 
-        windowBG = "rgb(66, 133, 129)"
-        selectedColor = "rgb(33, 82, 79)"
-        self.setStyleSheet(f"background-color: {windowBG}; font-size: 15px;")
-        colorBG = "rgb(143, 219, 215)"
+        windowBG = "rgb(170, 51, 106)"
+        selectedColor = "rgb(255,105,180)"
+        self.setStyleSheet(f"background-color: {windowBG}; font-size: 12px;")
+        colorBG = "rgb(244, 194, 194)"
         self.tabWidget = QTabWidget()
         self.tabWidget.setStyleSheet(f"QTabBar::tab:selected {{color: white; background-color: {colorBG};}};")
         self.journalTab = QWidget()
@@ -58,7 +58,8 @@ class Window(QMainWindow):
         self.journalLayout.addWidget(self.journalEdit, 0, 0, 1, 4)
 
         self.speechLabel = QLabel()
-        self.speechLabel.setText("\t    Hi! I'm Renji")
+        self.dogName = "Renji"
+        self.speechLabel.setText(f"\t Hi! I'm {self.dogName}!")
         self.speechLabel.setStyleSheet("background-image: url(img/speechbubble.png); background-repeat: no-repeat; font-size: 20px;")
         self.journalLayout.addWidget(self.speechLabel, 1, 0, 1, 3)
 
@@ -196,7 +197,7 @@ class sentimentThread(QThread):
 
             except Exception as e:
                 print(f"Sentiment Analysis Error: {e}")
-                default_text = "Renji needs a coffee break... Sentiment analysis failed."
+                default_text = f"{myWin.dogName} needs a coffee break... Sentiment analysis failed."
                 default_text = "\t" + "\n\t".join(wrapper.wrap(text = default_text))
                 self.speech_update.emit(default_text) # Report error via signal
                 
