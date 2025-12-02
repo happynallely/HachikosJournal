@@ -1,7 +1,7 @@
 - [X] Create title for app DONE
 - [X] Create description of the app DONE
 - [X] Research existing code files on GitHub DONE
-- [] Create Read.me commit DONE
+- [x] Create Read.me commit DONE
 - [X] Fork code to KSU IS DONE
 - [X] Clone files to Github Desktop and upload them to Visual Studio DONE
 - [X] Run the code DONE
